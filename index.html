@@ -86,6 +86,48 @@
             margin-top: 20px;
             color: #FF6666;
         }
+
+        #timer {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #FF6666;
+        }
+
+        #targetScore {
+            font-size: 18px;
+            padding: 5px;
+            width: 100px;
+            border: 2px solid #FF9966;
+            border-radius: 5px;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        #targetScore:focus {
+            border-color: #FF6666;
+        }
+
+        .mode-buttons {
+            margin-top: 20px;
+        }
+
+        .mode-buttons button {
+            font-size: 16px;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #FF6666;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .mode-buttons button:hover {
+            background-color: #FF9966;
+        }
     </style>
 </head>
 <body>
@@ -97,6 +139,12 @@
         <div id="score">Счет: 0</div>
         <div id="hint">Показать ответ</div>
         <div id="hintResult"></div>
+        <div id="timer"></div>
+        <div class="mode-buttons">
+            <button id="normalMode">Обычный режим</button>
+            <input type="number" id="targetScore" placeholder="Количество примеров">
+            <button id="speedMode">Режим на скорость</button>
+        </div>
     </div>
 
     <script>
@@ -104,6 +152,11 @@
         let problem;
         let showingHint = false;
         let currentProblemAnswer;
+        let targetScore;
+        let timer;
+        let startTime;
+        let speedMode = false;
+        let firstProblemSolved = false;
 
         function generateProblem() {
             const num1 = Math.floor(Math.random() * 10) + 1;
@@ -124,6 +177,12 @@
                 document.getElementById("result").style.color = "#4CAF50";
                 score++;
                 showingHint = false;
+                if (speedMode && !firstProblemSolved) {
+                    startTime = new Date().getTime();
+                    timer = setInterval(updateTimer, 10);
+                    firstProblemSolved = true;
+                }
+                checkTargetScore();
             } else {
                 document.getElementById("result").textContent = "Неправильно!";
                 document.getElementById("result").style.color = "#F44336";
@@ -143,15 +202,61 @@
             generateProblem();
         }
 
-        document.getElementById("answer").addEventListener("keydown", function(event) {
-            if (event.key === "Enter") {
-                checkAnswer();
+        function checkTargetScore() {
+            if (speedMode && score === targetScore) {
+                clearInterval(timer);
+                const elapsedTime = new Date().getTime() - startTime;
+                const minutes = Math.floor(elapsedTime / 60000);
+                const seconds = Math.floor((elapsedTime % 60000) / 1000);
+                const milliseconds = elapsedTime % 1000;
+                document.getElementById("timer").textContent = `Время: ${minutes}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(3, '0')}`;
             }
-        });
+        }
 
-        document.getElementById("hint").addEventListener("click", showHint);
+        function updateTimer() {
+    const elapsedTime = new Date().getTime() - startTime;
+    const minutes = Math.floor(elapsedTime / 60000);
+    const seconds = Math.floor((elapsedTime % 60000) / 1000);
+    const milliseconds = elapsedTime % 1000;
+    document.getElementById("timer").textContent = `Время: ${minutes}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(3, '0')}`;
+}
 
+function startSpeedMode() {
+    speedMode = true;
+    targetScore = parseInt(document.getElementById("targetScore").value);
+    if (targetScore > 0) {
+        score = 0;
+        document.getElementById("score").textContent = `Счет: ${score}`;
+        document.getElementById("timer").textContent = "";
+        firstProblemSolved = false;
         generateProblem();
-    </script>
+    } else {
+        alert("Пожалуйста, введите положительное число.");
+    }
+}
+
+function startNormalMode() {
+    speedMode = false;
+    score = 0;
+    document.getElementById("score").textContent = `Счет: ${score}`;
+    document.getElementById("timer").textContent = "";
+    document.getElementById("targetScore").value = "";
+    firstProblemSolved = false;
+    clearInterval(timer);
+    generateProblem();
+}
+
+document.getElementById("answer").addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+        checkAnswer();
+    }
+});
+
+document.getElementById("hint").addEventListener("click", showHint);
+document.getElementById("speedMode").addEventListener("click", startSpeedMode);
+document.getElementById("normalMode").addEventListener("click", startNormalMode);
+
+startNormalMode();
+</script>
 </body>
 </html>
