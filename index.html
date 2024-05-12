@@ -79,6 +79,13 @@
         #hint:hover {
             color: #FF9966;
         }
+
+        #hintResult {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #FF6666;
+        }
     </style>
 </head>
 <body>
@@ -88,29 +95,35 @@
         <input type="text" id="answer" placeholder="Введите ответ">
         <div id="result"></div>
         <div id="score">Счет: 0</div>
-        <div id="hint">Показать подсказку</div>
+        <div id="hint">Показать ответ</div>
+        <div id="hintResult"></div>
     </div>
 
     <script>
         let score = 0;
         let problem;
+        let showingHint = false;
+        let currentProblemAnswer;
 
         function generateProblem() {
             const num1 = Math.floor(Math.random() * 10) + 1;
             const num2 = Math.floor(Math.random() * 10) + 1;
             problem = `${num1} x ${num2}`;
+            currentProblemAnswer = num1 * num2;
             document.getElementById("problem").textContent = problem;
+            if (!showingHint) {
+                document.getElementById("hintResult").textContent = "";
+            }
         }
 
         function checkAnswer() {
             const userAnswer = parseInt(document.getElementById("answer").value);
-            const [num1, num2] = problem.split(" x ");
-            const correctAnswer = num1 * num2;
 
-            if (userAnswer === correctAnswer) {
+            if (userAnswer === currentProblemAnswer) {
                 document.getElementById("result").textContent = "Правильно!";
                 document.getElementById("result").style.color = "#4CAF50";
                 score++;
+                showingHint = false;
             } else {
                 document.getElementById("result").textContent = "Неправильно!";
                 document.getElementById("result").style.color = "#F44336";
@@ -123,11 +136,10 @@
         }
 
         function showHint() {
-            const [num1, num2] = problem.split(" x ");
-            const correctAnswer = num1 * num2;
-            alert(`Ответ: ${correctAnswer}`);
+            document.getElementById("hintResult").textContent = `Ответ: ${currentProblemAnswer}`;
             score--;
             document.getElementById("score").textContent = `Счет: ${score}`;
+            showingHint = true;
             generateProblem();
         }
 
