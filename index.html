@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Игра на умножение</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to bottom right, #FF9966, #FF6666);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #FF6666;
+            margin-top: 0;
+        }
+
+        #problem {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #FF9966;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        #answer {
+            font-size: 24px;
+            padding: 10px;
+            width: 150px;
+            border: 2px solid #FF9966;
+            border-radius: 5px;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        #answer:focus {
+            border-color: #FF6666;
+        }
+
+        #result {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: color 0.3s ease;
+        }
+
+        #score {
+            font-size: 20px;
+            margin-top: 30px;
+            color: #666;
+        }
+
+        #hint {
+            font-size: 18px;
+            margin-top: 30px;
+            color: #FF6666;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        #hint:hover {
+            color: #FF9966;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Игра на умножение</h1>
+        <div id="problem"></div>
+        <input type="text" id="answer" placeholder="Введите ответ">
+        <div id="result"></div>
+        <div id="score">Счет: 0</div>
+        <div id="hint">Показать подсказку</div>
+    </div>
+
+    <script>
+        let score = 0;
+        let problem;
+
+        function generateProblem() {
+            const num1 = Math.floor(Math.random() * 10) + 1;
+            const num2 = Math.floor(Math.random() * 10) + 1;
+            problem = `${num1} x ${num2}`;
+            document.getElementById("problem").textContent = problem;
+        }
+
+        function checkAnswer() {
+            const userAnswer = parseInt(document.getElementById("answer").value);
+            const [num1, num2] = problem.split(" x ");
+            const correctAnswer = num1 * num2;
+
+            if (userAnswer === correctAnswer) {
+                document.getElementById("result").textContent = "Правильно!";
+                document.getElementById("result").style.color = "#4CAF50";
+                score++;
+            } else {
+                document.getElementById("result").textContent = "Неправильно!";
+                document.getElementById("result").style.color = "#F44336";
+                score--;
+            }
+
+            document.getElementById("score").textContent = `Счет: ${score}`;
+            document.getElementById("answer").value = "";
+            generateProblem();
+        }
+
+        function showHint() {
+            const [num1, num2] = problem.split(" x ");
+            const correctAnswer = num1 * num2;
+            alert(`Ответ: ${correctAnswer}`);
+            score--;
+            document.getElementById("score").textContent = `Счет: ${score}`;
+            generateProblem();
+        }
+
+        document.getElementById("answer").addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                checkAnswer();
+            }
+        });
+
+        document.getElementById("hint").addEventListener("click", showHint);
+
+        generateProblem();
+    </script>
+</body>
+</html>
